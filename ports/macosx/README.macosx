@@ -1,0 +1,477 @@
+==============================
+   Build xxdiff for MAC OSX
+==============================
+
+:Author: Martin Blais <blais@furius.ca>
+:Date: 2005-06-03
+:Abstract:
+
+   Notes on how to build xxdiff for MAC OSX. 
+   I don't own an Apple computer yet, so I haven't done any of this myself.
+
+.. contents::
+..
+    1  From Trevor Harmon (2006-05-31)
+    2  Alexandre Feblot (2005-06-03)
+    3  Building under Mac OS X w/ XFree86 port (old)
+      3.1  Notes on Mac OSX from Rolf Boelens (old)
+    4  Matt Johnston <matt@ucc.asn.au>
+
+
+From Trevor Harmon (2006-05-31)
+===============================
+
+  From: Trevor Harmon <trevor@vocaro.com>	
+  To: Martin Blais <blais@furius.ca>
+  Date: May 31, 2006 7:43 PM
+  Subject: xxdiff for Mac
+
+  Hi,
+
+  I haven't started looking at a Qt4 port for xxdiff, but I did figure
+  out how to make it run natively on the Mac under Qt3 "out-of-the-
+  box". All that's needed is the patch I've attached for xxdiff.pro
+  (made against the 955 revision).
+
+  With the patch applied, here's how I built xxdiff on the Mac:
+
+  1. Install qt3, qt3mac, and flex-devel using Fink
+
+  2. Create a file called ~/.xxdiffrc and add the following line::
+
+       Style: "Macintosh (Aqua)"
+
+  3. Go to the Terminal and run the following commands::
+
+       export PATH="/sw/lib/flex/bin:$PATH"
+       export CPPFLAGS="-I/sw/lib/flex/include"
+       export LDFLAGS="-L/sw/lib/flex/lib"
+
+     This will cause flex 2.5.33 to be used instead of the built-in flex
+     2.5.4.
+
+  4. In the same Terminal, run the following commands::
+
+       export QTDIR=/sw/lib/qt3mac
+       export QMAKESPEC=macx-g++
+       export PATH="$QTDIR/bin:$PATH"
+
+     This will cause the Mac version of Qt to be used.
+
+  5. Switch to the xxdiff/src directory and run::
+
+       make -f Makefile.bootstrap makefile
+       make
+
+  6. You can now run xxdiff by specifying the absolute path to bin/
+     xxdiff.app/Contents/MacOS/xxdiff
+
+     Note that with this patch, the xxdiff.app directory in ports/macosx is no
+     longer necessary. It's generated automatically during the build
+     process. (Also, the __MACOSX directory should be removed, too.)
+
+  One other note: Even though the steps above generate an application
+  package for xxdiff, it can't be used directly. That is, you can only
+  run xxdiff by specifying the executable on the command line; double-
+  clicking on the app icon doesn't work. That's because if xxdiff is
+  run with no parameters, it immediately exits. Have you ever thought
+  about changing this? For instance, perhaps if no parameters are
+  given, xxdiff could prompt for the locations of the files/
+  directories. That would allow xxdiff to be used more easily in GUI
+  environments.
+
+  Trevor
+
+
+Alexandre Feblot (2005-06-03)
+=============================
+
+
+                            How-To build xxdiff on Mac OSX with
+native Aqua.
+
+- Build a Mac OSX Native Qt 3 (I used 3.3.4) with gcc-3.3 (does not
+compile yet with gcc 4.0; Qt 3.3.5 should)
+
+- Tweak the tmake mac config to use gcc-3.3 and to remove the no-
+exception flag
+  (file tmake-1.13/lib/macx-g++/tmake.conf)
+     - TMAKE_CC = gcc-3.3
+    - TMAKE_CFLAGS =  -pipe            (-fno-exceptions removed from
+here)
+    - TMAKE_CXX = c++-3.3
+    - TMAKE_LINK = c++-3.3
+    - TMAKE_LINK_SHLIB = c++-3.3
+
+- Generate the makefile. Compile.
+  No problem exept some double defined warnings, which I'll consider
+OK, as they also appear in the Qt examples.
+
+- Create the bundle:
+    xxdiff.app/
+    xxdiff.app/Contents
+    xxdiff.app/Contents/Info.plist
+    xxdiff.app/Contents/MacOS
+    xxdiff.app/Contents/MacOS/xxdiff
+    xxdiff.app/Contents/PkgInfo
+    xxdiff.app//Resources    (not necessary)
+    xxdiff.app//Resources/xxdiff.icns    (not necessary: an icon for
+the bundle appearence)
+
+    PkgInfo only contains 8 characters: APPL????
+
+    Info.plist is an XML property file:
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//
+EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+                <key>CFBundleDocumentTypes</key>
+                <array>
+                        <dict>
+                                <key>CFBundleTypeExtensions</key>
+                                <array>
+                                        <string>*</string>
+                                </array>
+                                <key>CFBundleTypeOSTypes</key>
+                                <array>
+                                        <string>****</string>
+                                        <string>fold</string>
+                                </array>
+                                <key>CFBundleTypeRole</key>
+                                <string>Editor</string>
+                        </dict>
+                </array>
+                <key>CFBundleExecutable</key>
+                <string>xxdiff</string>
+                <key>CFBundleGetInfoString</key>
+                <string>Created by Qt/QMake</string>
+                <key>CFBundleIconFile</key>
+                <string>xxdiff.icns</string>
+                <key>CFBundlePackageType</key>
+                <string>APPL</string>
+                <key>CFBundleSignature</key>
+                <string>ttxt</string>
+                <key>NOTE</key>
+                <string>Please, do NOT change this file -- It was
+generated by Qt/QMake.</string>
+        </dict>
+        </plist>
+
+- Copy the xxdiff executable in the bundle MacOS directory
+
+- Use xxdiff as usual on the command line, but specify an absolute
+path (or Qt will complain about this).
+  adding ~/bin/xxdiff.app/Contents/MacOS to the $PATH does not work
+  I just made an alias for this:
+     alias xxdiff='~/bin/xxdiff.app/Contents/MacOS/xxdiff'
+
+- Define the Aqua style in the .xxdiffrc
+  Style: "Macintosh (Aqua)"
+
+
+
+
+Building under Mac OS X w/ XFree86 port (old)
+=============================================
+
+The relevant part within the makefile is under macx-g++
+
+- Info on the Mac XFree86 port: http://apple.com/macosx/x11/
+
+- Info on the OpenDarwin ports: http://opendarwin.org/projects/darwinports/
+
+
+Notes on Mac OSX from Rolf Boelens (old)
+----------------------------------------
+
+::
+
+  Dear Martin,
+
+  A few years ago you helped me out on setting up xxdiff on Mac OSX 10.2 with
+  X11/xfree.  I moved now to OSX 10.3 with a newer machine and recompiled
+  xxdiff-2.9.2 and the latest xxdiff-3.0.2.  Since I like the program a lot, I
+  wanted to have it up and running again.
+
+  I used the latest OSX 10.3.2 and latest Developer Tools XCode 1.1 from Apple,
+  plus the Apple X11 release.
+
+  I will summarize what I had to adapt, it is really minor:
+
+  A. Commented out in xxdiff.pro the macx-g++ flags, since tmake does not
+     understand them and fails::
+
+       ...
+       #macx-g++:TMAKE_CXXFLAGS += -D__GNU_LIBRARY__
+       #macx-g++:TMAKE_CXXFLAGS -= -fno-exceptions
+       ...
+
+     The needed changes in Makefile can also be made later.
+
+  B. To make the Makefile::
+
+       % tmake xxdiff.pro -o Makefile
+
+  C. Needed changes in Makefile, use ``CXXFLAGS = -fexceptions``::
+        ...
+        CXXFLAGS=       -fexceptions -pipe -Wall -W -O3 -DNO_DEBUG
+        -DQT_THREAD_SUPPORT
+        ...
+
+  No other OSX specific c++ flags are needed anymore.
+
+  I added my own notes for testing both xxdiff versions.
+  I will try to post it at the sourceforge site as well, for your releif.
+
+  With best regards, Rolf
+
+
+
+Matt Johnston
+=============
+:Email: matt@ucc.asn.au
+
+Also provided a DMG image file, which I uploaded.
+
+::
+
+  Firstly, many thanks for xxdiff - I've been using it a fair
+  bit with monotone, it's the most effective merge tool I've
+  come across.
+
+  I've compiled a xxdiff-3.2 binary for OS X, with statically
+  linked Qt 4.1.3 as a universal binary (intel and ppc in the
+  one image, should work for 10.3.9 upwards). It's at
+  http://matt.ucc.asn.au/xxdiff/xxdiff-3.2.dmg as a disk
+  image. I've made a small change to make it so that
+  --prompt-for-files is the default if it's run
+  double-clicked, and included a shellscript to run it from
+  the commandline. (Qt requires that programs are run by the
+  full path). I've also given it a quick-hack text-and-circle
+  icon, rather than just taking Apple's FileMerge one :)
+
+  The instructions in qt4/NOTES.txt worked fairly well, though
+  I had to also change diffs.cpp in a couple of places, from
+  os.writeRawBytes( text, len );
+     to
+  os << QString::fromLocal8Bit(text, len);
+
+  I also made the colour values SVG-compliant, since the Mac
+  Qt4 doesn't seem to recognise some of the X11 values (see
+  below).
+
+  Cheers,
+  Matt
+
+  --- src/cmdline.cpp     8edd50a734f6ecfdc098dadae42a3575e7f4df79
+  +++ src/cmdline.cpp     6a74f1cf69a60d210c159ac12fb8c216746e10e5
+  @@ -210,7 +210,8 @@
+       "Copies the input streams/files into temporary files to perform diffing. "
+       "This is useful if you want to diff FIFOs."
+     },
+  -   { "prompt-for-files", 0, false, 'p',
+  +// Hack for os x - programs are run with an argument line -psn_0_36306945
+  +   { "prompt-for-files", 'p', true, 'p',
+       "If no files are specified on the command line, show a file dialog so that "
+       "the user can select them. This option is ignored if any files are specified."
+     },
+
+
+  --- src/resources.cpp   40a7008adf559712f2e4996684bddf357caafcb8
+  +++ src/resources.cpp   eea1f0859945130a6058a0a4c2c983079dce262a
+  @@ -208,56 +208,56 @@
+
+     if ( qApp != 0 ) { // protect setNamedColor() in case we have no display.
+        setFbColors( COLOR_SAME                   , "grey", "black" );
+  -      setFbColors( COLOR_SAME_BLANK             , "grey70", "black" );
+  +      setFbColors( COLOR_SAME_BLANK             , "#b2b2b2", "black" );
+        setFbColors( COLOR_DIFF_ONE               , "palegoldenrod", "black" );
+  -      setFbColors( COLOR_DIFF_ONE_SUP           , "lemonchiffon3", "black" );
+  +      setFbColors( COLOR_DIFF_ONE_SUP           , "lemonchiffon", "black" );
+        setFbColors( COLOR_DIFF_ONE_ONLY          , "palegoldenrod", "black" );
+  -      setFbColors( COLOR_DIFF_ONE_NONLY         , "lemonchiffon3", "black" );
+  -      setFbColors( COLOR_DIFF_TWO               , "lightblue2", "black" );
+  -      setFbColors( COLOR_DIFF_TWO_SUP           , "lightblue3", "black" );
+  -      setFbColors( COLOR_DIFF_TWO_ONLY          , "lightblue2",  "black" );
+  -      setFbColors( COLOR_DIFF_TWO_NONLY         , "lightblue3", "black" );
+  +      setFbColors( COLOR_DIFF_ONE_NONLY         , "lemonchiffon", "black" );
+  +      setFbColors( COLOR_DIFF_TWO               , "lightblue", "black" );
+  +      setFbColors( COLOR_DIFF_TWO_SUP           , "skyblue", "black" );
+  +      setFbColors( COLOR_DIFF_TWO_ONLY          , "lightblue",  "black" );
+  +      setFbColors( COLOR_DIFF_TWO_NONLY         , "skyblue", "black" );
+
+  -      setFbColors( COLOR_DELETE                 , "lightblue2", "black" );
+  -      setFbColors( COLOR_DELETE_BLANK           , "grey64", "black" );
+  +      setFbColors( COLOR_DELETE                 , "lightblue", "black" );
+  +      setFbColors( COLOR_DELETE_BLANK           , "#a3a3a3", "black" );
+
+  -      setFbColors( COLOR_INSERT                 , "darkseagreen2", "black" );
+  -      setFbColors( COLOR_INSERT_BLANK           , "grey64", "black" );
+  +      setFbColors( COLOR_INSERT                 , "darkseagreen", "black" );
+  +      setFbColors( COLOR_INSERT_BLANK           , "#a3a3a3", "black" );
+
+        setFbColors( COLOR_DIFF_ALL               , "palegoldenrod", "black" );
+  -      setFbColors( COLOR_DIFF_ALL_SUP           , "lemonchiffon3", "black" );
+  +      setFbColors( COLOR_DIFF_ALL_SUP           , "lemonchiffon", "black" );
+        setFbColors( COLOR_DIFF_ALL_ONLY          , "palegoldenrod", "black" );
+  -      setFbColors( COLOR_DIFF_ALL_NONLY         , "lemonchiffon3", "black" );
+  +      setFbColors( COLOR_DIFF_ALL_NONLY         , "lemonchiffon", "black" );
+
+        setFbColors( COLOR_DIFFDEL                , "palegoldenrod", "black" );
+  -      setFbColors( COLOR_DIFFDEL_SUP            , "lemonchiffon3", "black" );
+  +      setFbColors( COLOR_DIFFDEL_SUP            , "lemonchiffon", "black" );
+        setFbColors( COLOR_DIFFDEL_ONLY           , "palegoldenrod", "black" );
+  -      setFbColors( COLOR_DIFFDEL_NONLY          , "lemonchiffon3", "black" );
+  -      setFbColors( COLOR_DIFFDEL_BLANK          , "grey64", "black" );
+  +      setFbColors( COLOR_DIFFDEL_NONLY          , "lemonchiffon", "black" );
+  +      setFbColors( COLOR_DIFFDEL_BLANK          , "#a3a3a3", "black" );
+
+        setFbColors( COLOR_SELECTED               , "plum", "black" );
+        setFbColors( COLOR_SELECTED_SUP           , "thistle", "black" );
+
+  -      setFbColors( COLOR_IGNORE_DISPLAY         , "grey85", "black" );
+  -      setFbColors( COLOR_IGNORE_DISPLAY_SUP     , "grey80", "black" );
+  -      setFbColors( COLOR_IGNORE_DISPLAY_ONLY    , "grey80", "black" );
+  -      setFbColors( COLOR_IGNORE_DISPLAY_NONLY   , "grey80", "black" );
+  +      setFbColors( COLOR_IGNORE_DISPLAY         , "#d8d8d8", "black" );
+  +      setFbColors( COLOR_IGNORE_DISPLAY_SUP     , "#cccccc", "black" );
+  +      setFbColors( COLOR_IGNORE_DISPLAY_ONLY    , "#cccccc", "black" );
+  +      setFbColors( COLOR_IGNORE_DISPLAY_NONLY   , "#cccccc", "black" );
+
+        setFbColors( COLOR_DELETED                , "lightslategrey", "black" );
+        setFbColors( COLOR_DELETED_SUP            , "slategrey", "black" );
+
+  -      setFbColors( COLOR_IGNORED                , "grey70", "grey30" );
+  +      setFbColors( COLOR_IGNORED                , "#b2b2b2", "#4c4c4c" );
+
+        setFbColors( COLOR_DIRECTORIES            , "mediumturquoise", "black" );
+
+  -      setFbColors( COLOR_MERGED_UNDECIDED       , "lemonchiffon3", "black" );
+  -      setFbColors( COLOR_MERGED_DECIDED_1       , "grey60", "black" );
+  -      setFbColors( COLOR_MERGED_DECIDED_1_SUP   , "grey70", "black" );
+  -      setFbColors( COLOR_MERGED_DECIDED_2       , "grey60", "black" );
+  -      setFbColors( COLOR_MERGED_DECIDED_2_SUP   , "grey70", "black" );
+  -      setFbColors( COLOR_MERGED_DECIDED_3       , "grey60", "black" );
+  -      setFbColors( COLOR_MERGED_DECIDED_3_SUP   , "grey70", "black" );
+  -      setFbColors( COLOR_MERGED_DECIDED_NEITHER , "grey70", "black" );
+  +      setFbColors( COLOR_MERGED_UNDECIDED       , "lemonchiffon", "black" );
+  +      setFbColors( COLOR_MERGED_DECIDED_1       , "#999999", "black" );
+  +      setFbColors( COLOR_MERGED_DECIDED_1_SUP   , "#b2b2b2", "black" );
+  +      setFbColors( COLOR_MERGED_DECIDED_2       , "#999999", "black" );
+  +      setFbColors( COLOR_MERGED_DECIDED_2_SUP   , "#b2b2b2", "black" );
+  +      setFbColors( COLOR_MERGED_DECIDED_3       , "#999999", "black" );
+  +      setFbColors( COLOR_MERGED_DECIDED_3_SUP   , "#b2b2b2", "black" );
+  +      setFbColors( COLOR_MERGED_DECIDED_NEITHER , "#b2b2b2", "black" );
+     }
+
+     _backColors[ COLOR_BACKGROUND ] = QColor( 0x40, 0x61, 0x6a, QColor::Rgb );
+
+From Juan, bugs::
+
+  En ouvrant les options j'ai ceci dans la console:
+
+  Object::connect: No such signal QRadioButton::stateChanged(int)
+  Object::connect:  (sender name:   '_radiobuttonQualityNormal')
+  Object::connect:  (receiver name: 'XxOptionsDialogBase')
+  Object::connect: No such signal QRadioButton::stateChanged(int)
+  Object::connect:  (sender name:   '_radiobuttonQualityFastest')
+  Object::connect:  (receiver name: 'XxOptionsDialogBase')
+  Object::connect: No such signal QRadioButton::stateChanged(int)
+  Object::connect:  (sender name:   '_radiobuttonQualityHighest')
+  Object::connect:  (receiver name: 'XxOptionsDialogBase')
+
+
+More email::
+
+  > Also, could you explain why you need to have the --prompt-for-file
+  > accept and argument?  Who supplies this -psn_0_36306945 argument?
+
+  I think it is the OS X windowserver or something that
+  supplies the -psn_... argument - I'm not exactly sure of the
+  purpose, I think it's a process identifier of sorts. I gave
+  --prompt-for-file -p as a short flag and allowed it to
+  accept an argument, so it will see the equivalent of '-p
+  sn_0_36306945' (or --prompt-for-file=sn_0_36306945) when
+  doubleclicked. Running from a commandline it doesn't get
+  given the -psn...  argument. It's a hack, but works.
+
+
+
+Files included::
+
+- xxdiff-3.2-osx.diff
+- xxdiff.png
+
+Steps::
+
+  Steps to build in OS X 10.4, Intel. Compiled as a static
+  binary so that a self-contained xxdiff.app bundle is
+  produced.
+
+  tar jxvf xxdiff-3.2.tar.bz2
+
+  cd xxdiff-3.2
+  cat ../xxdiff-3.2-osx.diff|patch -p0
+
+  cd src
+  /usr/local/Trolltech/Qt-4.1.3-static/bin/qt3to4 xxdiff.pro
+  (confirm all)
+
+  make -f Makefile.bootstrap Makefile
+
+  * manually edit Makefile so that flex and bison point to /opt/local/bin (from
+   darwinports), since the os x versions don't seem to work.
+  * add "-arch i386 -arch ppc" to CFLAGS, CXXFLAGS, and LFLAGS in Makefile for a
+   universal binary.
+   (Qt was compiled as a universal binary with its appropriate configure flags)
+  * remove the _debug suffixes from -lQtGui_debug, -lQtCore_debug etc in
+   Makefile's LFLAGS line
+
+  make
+  cd ../bin
+  strip xxdiff.app/Contents/MacOS/xxdiff
+
+  Then combine it with the xxdiff.app bundle directory in the xxdiff ports/macosx
+  dir. Note that Resources should be xxdiff.app/Contents/Resources, not just
+  xxdiff.app/Resources. I replaced the .icns file with one made quickly in Gimp.
+
+
+Alexandre Feblot [2010-11-09]
+=============================
+
+A port to Mac OS X by Alexandre has shown up in november 2010:
+
+  Hi Martin,
+
+  I think I'm done now, except some features I might want to add. See
+  below the list of current changes compared to your dev version.
+  Please, give me a sign, let me know what to do with this code. Shall I
+  provide you the repository? Shall I put it online somewhere, which
+  would mean creating a fork (I'd hate this idea)? 
+
+  Regards,
+
+  --- Changes ---
+  * Full Qt4 (.ui files in Qt4 format, no use of Qt3Support)
+  * Ability to double click the application on OSX to start it
+  * When saving a file with unselected chunks, we now uses conflict markers
+    which we understand when unmerging. Those markers may be customized
+    with resources Tag.Conflict.{Start,Sep,SepExtra,End} which replace
+    Tag.Conflict.Separator. %L, %M, %R are replaced by left, middle and right files.
+  * GUI refresh to show a more modern look (frames, file labels, line numbers, 
+    cursor)
+  * Allow to clear search results by searching for an empty string
+  * Add instant search bar in the online user's manual
+  * Allow to click in the overview to jump to the chosen area
+  --- Bugfix ---
+  * Merged views now scroll and relocate to the cursor line properly
+  * Resource 'ShowPaneMergedViewPercent' was not taken into account
+  * With Aqua style on OSX, the frame showing the current selected color in the
+    color option tab was not visible
+  * Diffs are properly recomputed after a file edition
+  * Fix copy/pasting text on OSX
+  * Fix to build on Solaris 10, Sun Studio 12
+  * Fix (workaround) random crash in horizontal diffs computation
+
+

@@ -1,0 +1,132 @@
+====================================
+xxdiff: Build Notes and Instructions
+====================================
+
+xxdiff is a graphical file and directories comparison and merge tool.
+
+Official home page:
+    http://xxdiff.sourceforge.net
+Original author:
+    Martin Blais <blais@furius.ca>
+
+Full documentation is available from the Help menu or web site.
+Various integration tools are available under the tools subdirectory
+(CVS, ClearCase, etc.)
+
+
+Building from source
+====================
+
+Requirements
+------------
+
+- GNU make.  You will need GNU make.  Don't waste your time with other makes,
+  many are known not to work (Sun's, as well as OSF1).
+
+- A C++ compiler with a decent STL
+
+- flex >=2.5.31
+
+- bison
+
+- Qt >=4.5
+
+Compiling
+---------
+
+Compiling xxdiff::
+
+   cd xxdiff/src
+   make -f Makefile.bootstrap # Generate the 'Makefile' file.
+   make                       # Build xxdiff
+
+
+Notes
+~~~~~
+
+* For a long time, xxdiff was based on qt3, but was finally ported to
+  qt4 in november 2010 by Alexandre Feblot.
+
+* Note: xxdiff used to require the obsolete tmake tool, but has been ported to
+  use qmake in may 2006.
+
+* Depending on your platform, you may have to set your QTDIR manually
+  (e.g. to /usr/lib/qt4)
+
+* You may have to edit CONFIG to include the option 'thread' or not, depending
+  on if you have only the multi-threaded version of qt installed or not
+  (libqt-mt).  xxdiff does not specifically need it and can build and run
+  without the multi-threaded version of Qt.  Re-run take after making the
+  change.
+
+
+Installation
+------------
+
+::
+
+    su -
+    install xxdiff/src/xxdiff /usr/X11R6/bin
+
+You can generate HTML documentation with ``xxdiff --help-html`` if you want.
+
+
+Packaging
+=========
+
+* Source packaging:
+  adm/release_src
+
+* Simple binary packaging (all platforms):
+  adm/release_bin
+
+* Redhat Linux packaging:
+  adm/release_i386_rpm
+
+* Debian Linux packaging:
+  See web page for link to current port.
+
+* OpenBSD packaging:
+  In the ports tree.
+
+* SGI packaging:
+  adm/release_mips_tardist
+
+  Note: to install the SGI package you'll need fw_qt and it's
+  prerequisites. Installing from tardist package::
+
+    inst -f xxdiff-<version>.mips.tardist
+    > go
+
+
+The author's own release process
+--------------------------------
+
+0) check
+   1a) the doc files have been generated.
+   1b) the version number is correct
+
+1) apply release tag to cvs files
+
+2) build (see instructions above)
+   2a) run tests in xxdiff/test
+
+3) build packages (see instructions above)
+
+4) distribute
+   - add release to sourceforge project
+   - upload to sourceforge htdocs (secondary download location)
+   - upload to sourceforge web page
+   - upload to rhcontrib.bero.org
+
+5) announce
+   - sourceforge project release announcement
+   - update web site
+   - freshmeat
+   - rh-contrib (bero)
+   - qt-interest
+   - cervisia list
+   - wincvs list
+   - sgi freeware
+   - discreet
+

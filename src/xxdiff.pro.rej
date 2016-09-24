@@ -1,0 +1,20 @@
+***************
+*** 111,121 ****
+  ## macx-g++:QMAKE_CXXFLAGS += -D__GNU_LIBRARY__
+  ## macx-g++:QMAKE_CXXFLAGS -= -fno-exceptions
+  
+- QMAKE_CFLAGS -= -O2
+- QMAKE_CXXFLAGS -= -O2
+- QMAKE_CFLAGS += -O3 -march=native
+- QMAKE_CXXFLAGS += -O3 -march=native -stdlib=libc++
+- QMAKE_LFLAGS += -L/opt/local/lib -Wl,-headerpad_max_install_names
+  
+  #----------------------------------------
+  # Max OS X (macx-g++ for command line build)
+--- 110,115 ----
+  ## macx-g++:QMAKE_CXXFLAGS += -D__GNU_LIBRARY__
+  ## macx-g++:QMAKE_CXXFLAGS -= -fno-exceptions
+  
+  
+  #----------------------------------------
+  # Max OS X (macx-g++ for command line build)

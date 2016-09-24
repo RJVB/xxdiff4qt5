@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# $RCSfile$
+#
+
+if [ ! -d "adm" ]; then
+     echo "You must be running this script from the topdir directory."
+     exit 1;
+fi
+
+VERSION=`adm/get_version`
+
+SBASE=.
+COMPONENTS="xxdiff xxdiff.idb xxdiff.sw xxdiff.man"
+DEST=$PWD/../xxdiff-$VERSION.mips.tardist
+
+# Generate help
+$SBASE/src/xxdiff --help-html > $SBASE/src/xxdiff-doc.html
+
+# Generate distribution.
+gendist -sbase $SBASE -idb $SBASE/adm/xxdiff-sgi.idb \
+ -spec $SBASE/adm/xxdiff-sgi.spec -dist /tmp -all
+
+( cd /tmp  ; tar cvf $DEST $COMPONENTS ; rm $COMPONENTS )
+

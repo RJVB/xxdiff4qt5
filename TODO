@@ -1,0 +1,1752 @@
+==================
+   TODO: xxdiff
+==================
+
+.. contents::
+..
+    1  Next Release
+      1.1  Priorities
+      1.2  Qt4
+    2  Less Urgent, but do it soon too
+    3  Look at ``wiggle`` integration, it seems like a great idea
+    4  Goals for 4.0 stable release:
+    5  Promo
+    6  Other
+
+
+Next Release
+============
+
+Priorities
+----------
+
+- xxdiff: Make xxdiff recursive able to list all the files when a
+  directory is only on one side. Walk and enumerate the files of an
+  inserted or deleted directory.
+
+- xxdiff: Fix geometry window sizing problem.
+
+- xxdiff: Convert it to port to Qt4 and support unicode
+
+  - Windows port, use the patch from Trevor Harmon
+  - MAC port
+  - Patch output support?
+
+
+
+Qt4
+---
+
+- Bug with saving with ignored patterns: Which side gets selected?
+
+      Ah I see.
+      The problem is a definitional one.
+      When you say "Save as..", it is not clear what to do with the ignored regions, xxdiff should warn about that.
+      It's indeed a problem...
+
+      The issue is that xxdiff does not output sed commands... it selects the regions and saves the results directly.
+
+      You should probably not use the ignore switch with save... I never considered that case.
+      BTW, "Save As Right" does not mean anything about selecting text from the file on the right, it is the same as "Save As"
+      and selecting the filename of the file on the right.
+
+      THanks for the bug report, I'll add it to the TODO list.
+
+      cheers,
+
+      Lee Gramling wrote:
+      > > Martin,
+      > > Thanks for your quick response, I am sure its just my expectations that
+      > > are wrong but here is better description:
+      > > 
+      > > Run the following command on the files listed below:
+      > >  xxdiff d2.iv d1.iv -A "-I position.*"
+      > > 
+      > > xxdiff when show the following differences:
+      > > d2.iv                                     d1.iv
+      > > position 50 50 200                position 50 50 280     #these are
+      > > ignored and not highlighted
+      > > 
+      > > angle 3.19                            angle 1.57
+      > > 
+      > >  Text3 {
+      > >             string  =
+      > >                  GlobalField {
+      > >                      type    "SFTime"
+      > >                      realTime
+      > >                  }
+      > >                  . realTime
+      > >          }
+      > > 
+      > > Select the right angle 1.57
+      > > and the left Text3 block
+      > > 
+      > > Then do a File->Save as right
+      > > File->Redo diff
+      > > 
+      > > Now the files looks like this:
+      > > d2.iv                                     d1.iv
+      > > position 50 50 200                position 50 50 200     #d1.iv has the
+      > > wrong value for position
+      > > 
+      > > angle 3.19                            angle 1.57
+      > > 
+      > >  Text3 {                                    Text3 {
+      > > string  =                                   string =
+      > > GlobalField {                            GlobalField {
+      > > type    "SFTime"                       type    "SFTime"
+      > > realTime                                   realTime
+      > >  }                                               }
+      > >  . realTime                                .realTime
+      > >   }                                              }
+      > > 
+      > > The ignored position line has been copied to the right file (I would not
+      > > expect this).
+      > > The selected right angle 1.57 is correct and the left selected Text3
+      > > line has been added as expected.
+      > > 
+      > > I guess what I expect is more like what would happen if you ran diff
+      > > with the ignore
+      > >  diff d2.iv d1.iv "-I position.*"
+      > > 15c15
+      > > <             angle   3.19
+      > > ---
+      >> >>             angle   1.57
+      > > 25,32d24
+      > > <          Text3 {
+      > > <             string  =
+      > > <                 GlobalField {
+      > > <                     type    "SFTime"
+      > > <                     realTime
+      > > <                 }
+      > > <                 . realTime
+      > > <         }
+      > > 
+      > > The ignored lines do not get output as sed commands.
+      > > 
+      > > Thanks for your time.
+      > > 
+      > > Lee
+      > > 
+      > > 
+      > >  d1.iv:
+      > >  Separator {
+      > >         PerspectiveCamera {
+      > >             position 50 50 280
+      > >         }
+      > >         Text3 {
+      > >             string  "undefined" =
+      > >                 GlobalField {
+      > >                     type    "SFTime"
+      > >                     realTime
+      > >                 }
+      > >                 . realTime
+      > >         }
+      > >         RotationXYZ {
+      > >             axis    Z
+      > >             angle   1.57
+      > >         }
+      > >         Text3 {
+      > >             string  =
+      > >                 GlobalField {
+      > >                     type    "SFTime"
+      > >                     realTime
+      > >                 }
+      > >                 . realTime
+      > >         }
+      > >     }
+      > > 
+      > >  d2.iv
+      > >  Separator {
+      > >         PerspectiveCamera {
+      > >             position 50 50 200
+      > >         }
+      > >         Text3 {
+      > >             string  "undefined" =
+      > >                 GlobalField {
+      > >                     type    "SFTime"
+      > >                     realTime
+      > >                 }
+      > >                 . realTime
+      > >         }
+      > >         RotationXYZ {
+      > >             axis    Z
+      > >             angle   3.19
+      > >         }
+      > >         Text3 {
+      > >             string  =
+      > >                 GlobalField {
+      > >                     type    "SFTime"
+      > >                     realTime
+      > >                 }
+      > >                 . realTime
+      > >         }
+      > >          Text3 {
+      > >             string  =
+      > >                 GlobalField {
+      > >                     type    "SFTime"
+      > >                     realTime
+      > >                 }
+      > >                 . realTime
+      > >         }
+      > >     }
+      > > 
+      > > 
+      > > 
+      > > On Nov 19, 2007 10:04 AM, Martin Blais <blais@furius.ca
+      > > <mailto:blais@furius.ca>> wrote:
+      > > 
+      > >     Hi Lee
+      > >     Can you send a step-by-step description to reproduce the problem?
+      > >     I don't quite understand your explanation below.
+      > >     (I would highly doubt a bug in that part of xxdiff at this point.)
+      > >     thx
+
+
+- Apply Trevor Harmon's patch for the port to Qt4.
+
+- Finish half-started save-to-patch feature:
+
+  * Add an option to the xxdiff GUI to invert the selections, or to save the
+    negative of the selections to a file.  Using this, we could split a file in
+    half.  This should not be available in 3-way diffs mode.
+
+
+
+- Fix this bug::
+
+    Grant McDorman <grmcdorman@gmail.com>:
+
+      I've got xxdiff running - with patches on Win32 with Qt Free 4.2.0 (and
+      mingw). Fixes were required, not suprisingly.
+
+      There was also what appears to be a real bug that showed up. In
+      hordiffimpl.cpp, there's a loop that starts like this:
+
+            while ( x > -1 && y > -1 ) {
+      #ifdef XX_LOCAL_HDIFF_DEBUG
+               cerr << x << " " << y << " = " << htable[ x + y*tlen0 ] << endl;
+      #endif
+
+               if (
+                  ( htable[ x + y*tlen0 ] == ( htable[ x-1 + (y-1)*tlen0 ] + 1 ) /*||
+                    htable[ x + y*tlen0 ] == htable[ x-1 + (y-1)*tlen0 ]*/ ) &&
+                  ctext0[x] == ctext1[y]
+
+      However, the problem is if x or y becomes 0, then one can have a negative
+      subscript on the second htable index. This can cause crashes. I fixed by
+      making it '> 0' instead of '> -1'.
+
+      There were also layout problems, such as the headers (filename/line number
+      way too bing); it's not clear to me if this is a Qt4 problem or a Win32
+      problem.
+
+      There are still a few minor problems: the file names start up blank (if
+      one does 'replace file' from the file menu, it's labelled correctly); and
+      the colour swatches in the display options dialog, Colors tab, don't
+      change colour at all. I haven't tracked those down yet.
+
+      I can send you the patch on request - or submit to SF.
+
+
+Less Urgent, but do it soon too
+===============================
+
+* Add a '-w' option to invoke.py (!?), to ignore whitespace changes easily.
+
+* When the comments file has not changed, warn the user that he did not appear
+  to have saved the file.
+
+* It would be awesome if select.py had an option to select by file-type
+  (e.g. running “file”).  Open a child running a “file” command and feed it the
+  filenames one-by-one rather than starting a new one everytime.
+
+* Look at fixing the bugs in xxdiff/test/bugs
+
+* For MAC OSX: if there are no files specified, invoke a special double- file
+  dialog chooser to graphically select which files to diff.
+
+* xx-svn-diff: Comments file: To add new files to the comments file:
+
+  a) Check if at least one line of the comments file is the same as any line of
+     the status OR if the file is empty
+
+  b) if so, add all the status lines tha tdiffer at thte end of the comments
+     file (with an empty line in between)
+
+  c) otherwise we do not append the new statii lines
+
+* Bug: toggling "Format clipboard text" at runtime does not seem to have an
+  effect.
+
+* Fix [1200496] Diff Errors reported with certain text files
+
+* xx-svn-diff: Implement fetching any two revisions and displaying the filelist
+  and the diffs graphically for those changes.
+
+* See open bug [1174957] Odd behavior when "-O" and "-E" used together:  When
+  --exit-if-no-conflicts and --merged-filename are specified together, and there
+  are no conflicts, output the result file to the merged filename.
+
+* There is a slight rendering bug with my current font (see png file under /bugs)
+
+* Define a clearer list of verbosity levels that is consistent across all the
+  scripts and change the levels.
+
+* Automatically log output to a log file in the backups directory if the backups
+  are enabled, that would rock.
+
+--------------------------------------------------------------------------------
+(Scripts)
+
+* When xxdiff is invoked with --decision and -D, which answer should result?
+  Right now we output NODECISION, but perhaps ACCEPT would be more appropriate?
+  I'm not sure.
+
+* Write an asynchronous background loop in xformloop for slow processes, where a
+  number of diffs could accumulate in the background and be ready to diff while
+  whatever is being done to produce the diffs keeps running.  Grab this from my
+  good old exp preview.  Put this in ``lib/python/xxdiff/async.py``
+
+  (Note: this goes hand-in-hand with the diff'ing of arbitraty SVN revisions, as
+  we will have to fetch files from the network and this might be slow.
+  Implement both of these features at the same time.)
+
+* xx-svn-diff: When the parent process gets killed, make sure to kill the
+  editor as well, otherwise it can be really annoying because this leaves swap
+  files around if we restart manually killing the editing window (which can
+  happen if you leave it in the background).
+
+* Provide a way to invoke xxdiff with alternate diff programs.
+
+  - Using this code, provide code to create alternate diff programs that compare
+    pairs of things, with or without subdiffs, by outputting POSIX diff output.
+
+
+* xx-rename: With respect to case sensitivity, supports the smart
+  replacement behaviour that is present in GNU emacs.
+
+* Implement a better side-by-side diff that includes line numbers and context.
+  The current side-by-side diff sucks.  One of the things that could be done
+  easily is reuse diff --side-by-side without compressing, adding the line
+  numbers by hand, and then compressing by hand too.
+
+  - Add an option to generate normal diffs rather than side-by-side.
+
+* xx-patch: Finish It! 
+
+  * You have to deal with 'delete' and 'add' cases.
+
+  * Q: what do we do when patch fails?  How do we treat it?
+    must read the output messages of patch and warn the user.
+
+* xx-svn-diff: TODO
+
+  * --launcher: Create simple PyQt or CURSES GUI for listing files from ``svn
+    status``, on which you can click to view the diffs.
+
+  * Implement including differences from the ancestor file with 3-way diffs.
+
+  * Implement viewing differences between any two revision in the repository.
+
+  * Wouldn't it be nice to have a decision mode here?  Maybe, maybe not.  You
+    can save as merged if desired, the merged filename is set to the output
+    filename.
+
+* Fix these old subprocesses by using the subprocess module::
+
+   banane:~/p/.../python/xxdiff$ igrep os.popen .
+   ./scripts/encrypted.py:        fin, fout = os.popen2(decodecmd % m, 'w')
+   ./scripts/encrypted.py:        fin, fout = os.popen2(cmd, 'w')
+   ./scripts/cvsdiff.py:        cin, cout = os.popen2(
+   ./scripts/patch.py:        cin, cout = os.popen2(cmd, 'rw')
+
+* Implement --single-right: we should be able to display single files on either
+  side.  You should fix xx-match after that, so that it passes the correct
+  options to xxdiff.
+
+* Consider putting a check for binary files in xxdiff.invoke.* and raise a
+  RuntimeError if the files aren't text.
+
+* xx-rename: We should able to read renames from a file, two names by line, or
+  something similar.
+
+--------------------------------------------------------------------------------
+
+* Idea: we could modify xxdiff so that when we reload, we could output RELOAD
+  and that could mean for the client to redo some task in the background, then
+  let xxdiff know to reload after that.  This would allow xxdiff to communicate
+  with the parent process.  This should actually be part of a larger protocol
+  for client to communicate with xxdiff and vice-versa.  This is a cool idea,
+  but a lot of work for very little benefit.
+
+* Check if this bug is gone::
+
+    I set up xxdiff-subversion on my workstation following web page at
+    http://xxdiff.sourceforge.net/local/doc/xxdiff-subversion.html. It works
+    just fine for svn diff command. But for svn up, if there is a conflict,
+    xxdiff will pop up showing three way difference. When I close xxdiff
+    window, I found my working copy of that conflicting file became blank!
+    So I lost all my changes in that file!
+
+    My current solution is not to set diff3-cmd in ~/.subversion/config file.
+
+    --Long
+
+    PS: I am using FreeBSD.
+    pkg_info -Ix xxdiff
+    xxdiff-3.0.3        QT interface to view/merge differences between 2 or
+    3 files
+    pkg_info -Ix subversion
+    subversion-1.3.0_3  Version control system
+
+
+* From Michalis Giannakidis, mgiann@beta-cae.gr
+
+  Do this:
+
+    What, here in our company, find useful about cvsxxdiff is:
+    o) cvsxxdiff is one file. No python module directory or initialization is
+    requierd.
+    o) Do a 'cvs up; cvsxxdiff' before commit to see all the local changes we have
+    made.
+    o) Do 'cvs up; cvsxxdiff -b 1 file.c' to see the last chages that were made on
+    a file by a colleague.
+    o) We often need to track bugs in our code. This means going back to previous
+    revisions, thus doing ex: 'cvsxxdiff -b 1 -b 2 file.c' to compare the
+    previous with the 2nd previous revision. (similar with cvsxxdiff -r 1.1 -r
+    1.2 file.c)
+    o) The utility prints  in the standard output the logs between revisions i
+    and j ( ex: cvsxxdif -b i -b j file.c)
+
+    One script to do it all.
+
+
+
+
+
+Look at ``wiggle`` integration, it seems like a great idea
+==========================================================
+
+  From: Ken.MacLeod@radisys.com <Ken.MacLeod@radisys.com>	
+  To: blais@furius.ca
+  Date: Aug 10, 2006 9:17 AM
+  Subject: xxdiff: patch wiggling
+  Reply | Reply to all | Forward | Print | Add sender to Contacts list | Delete this message | Report phishing | Show original | Message text garbled?
+  A long while back in 2003, you wrote,
+  http://www.uwsg.iu.edu/hypermail/linux/kernel/0203.2/1177.html
+
+  Not long after, Niel Brown announced 'wiggle',
+  http://www.uwsg.iu.edu/hypermail/linux/kernel/0305.2/0762.html
+
+  Niel mentions one of the shortcomings in wiggle is that you can't "see"
+  what it's done or will do.  Here's where xxdiff can pick that up.  These
+  are just thoughts off the top of my head, sorry I won't have patches
+  forthcoming with implementation :-/
+
+  I'd like to see the entire patch in the left pane, probably in the format
+  used by gitweb[1] or gitk[2, screenshot in 3].
+
+  Selecting a patch hunk on the left brings up the corresponding source in
+  the right pane, with the "new" changes highlighted (with horizontal diff,
+  natch :-).  The old changes are not necessary, though a three-pane view
+  could have them on the left.
+
+  The hunks in the patch pane should be marked according to their merge
+  status, ie. green for success, yellow for offset, orange for fuzz, and red
+  for failed.  A "check mark" would be nice for hunks that have been
+  confirmed and/or fixed up.
+
+  If a patch fails because the file cannot be found due to a rename, the
+  merge path should be editable.  (Auto-rename is possible if both trees are
+  available.)
+
+  Wiggle's algorithm is good for finding better matches.
+
+  Changes should not be applied until selected from a menu.
+
+  After wiggling, the patch should be saved so that it can be emailed.  The
+  updated patch should now cleanly apply against the tree it was wiggled to
+  (ie. counts and offsets corrected, a la recountdiff).
+
+  OK, that's all I can brain dump for now.  Of course, it wasn't until after
+  writing it that I see xx-patch, so, take whatever good bits seem to make
+  sense :-)
+
+   -- Ken
+
+  [1]
+  http://www.kernel.org/git/gitweb.cgi?p=linux/kernel/git/torvalds/linux-2.6.git;a=log
+  [2] http://ozlabs.org/~paulus/gitk/
+  [3] http://lwn.net/Articles/140350/
+
+
+
+--------------------------------------------------------------------------------
+
+- Install xxdiff on windows, when Qt4 non-commercial comes out
+
+- try beyondcompare::
+
+   Si jamais tu veux retravailler sur xxdiff, je viens de trouver le canif
+   suisse des diffs graphiques, tu manqueras pas d'id\x{00E9}es pour xxdiff
+   avec \x{00E7}a... Absolument incroyable (mais c'est un produit
+   commercial). \x{00C7}a s'appelle "Beyond Compare" de Scooter Software. Le
+   genre de programme qui te fait dire "enfin sti". \x{00C7}a compare aussi des
+   r\x{00E9}pertoires (r\x{00E9}cursivement itou, avec des diffs par fichier),
+   et c'est aussi incroyablement facile de faire un merge. Vraiment
+   g\x{00E9}nial..
+   http://www.scootersoftware.com/
+
+
+
+* Bugs with horizontal diffs:
+
+    However, I do have a suggestion. Your code does not
+    seem to be using a logic such as the Ratcliff/Obershelp
+    pattern recognition algorithm, which is adopted by some
+    other common graphical diff tools. Using such a logic,
+    they search for the longest common substring between
+    two strings. The match is then used as an archor,
+    around which they would recursively do the same for the
+    left and right remaining pieces.
+
+
+New feature, ignore regexp patterns::
+
+  Bonjour Martin,
+  Comme convenu voici le  feature  que je trouvais utile dans Examdiff Pro :
+  - Regular Expression support dans le champs Ignore.
+  Exemple :
+              Faire une comparaison de 2 fichiers contenant des UID que je ne veux pas considérer comme différent lors de la comparaison.
+  Contexte :
+              j'avais a comparer des fichiers generes par un generateur de code java.  les fichiers contenait des code pockets du genre:
+  // BEGIN Code pocket ID : XXXX-XXXX-XXXX-XXXX
+  // Some code to be preserved when regenarating
+  // END Code pocket ID : XXXX-XXXX-XXXX-XXXX
+
+  Je pouvais avec Examdiff Pro exclure de ma comparaison les "Code pockets" au
+  complet (pas seulement les tag mais aussi le contenu du code pocket avec un
+  regular expression.  Voil
+
+
+* fix bug on tp with 3-way, press S::
+
+    QPixmap: Invalid pixmap parameters
+    QPainter::begin: Cannot paint null pixmap
+    QPainter::setPen: Will be reset by begin()
+    Segmentation fault
+
+
+
+* with option --single it would be nice to be able to say that the file should
+  be displayed on the right side and not the left, this would be nice for
+  directory diffs when clicking on a hunk where there is only a file on the
+  right.  Right now the file appears on the left anyway, which just looks wrong.
+
+
+
+* Maybe create a new return code for the combination of ``--decision`` and
+  ``-D``::
+
+    int XxApp::exec()
+    {
+       if ( _dontShow ) {
+          // If we asked for a decision, at least output something.
+          // FIXME: maybe this should become NODIFF?
+          if ( _cmdline._forceDecision == true ) {
+             std::cout << "NODECISION" << std::endl;
+
+
+
+* prepare to build with qmake
+
+
+
+* add the horizontal marker to the options dialog as well.
+
+
+* xxdiff test/tabs/w2a test/tabs/w2b::
+
+        while ( true ) {
+     #ifndef XX_INTERNAL_DIFFS
+           // FIXME here we should change the code so that reading a line
+           includes // the carriage return characters within the line.  This
+           results in // harmless but nonetheless annoying empty diff error
+           messages.
+           QString line = outputs.readLine();
+
+
+* Known problem:
+
+  - set tab width to 0
+  - diff files which have tabs and spaces but other characters the same
+  - set hordiff threshold low enough
+
+  We get minimum hordiff width to 1 with this combination.
+  I think we would need to recompute the diffs.
+
+
+
+
+
+
+
+
+.. end
+
+(Horizontal Diffs)
+
+- post-process, idea from Derrick Moser, slide to the left until a word boundary
+  is met on either side or is impossible
+
+
+Goals for 4.0 stable release:
+=============================
+
+   * Finish scrollbars resizing for paned merged view.
+   * Improve error recovery in rcfile parsing.
+
+
+Promo
+=====
+
+- promotion on xxdiff webpage before release:  ask ev and gd for a quote, how
+  many developers, etc.
+
+- send email to GnuPG mailing-list about xx-encrypted script
+
+
+
+
+
+Other
+=====
+
+* write a script that can preview ``xdelta patch``.
+
+* add a command to keep spit out the output of diff in a window (useful for
+  debugging as well)
+
+* add an option to edit the file from the popup menu, it's more direct like
+  that than using the File menu.
+
+  - same for Save As...
+  - also add a "save as and edit" option.
+
+
+* From qt-3.2::
+
+    QPainter's complex drawText() function has been highly
+    optimized. Despite its support for complex unicode scripts, it now
+    performs better than its less unicode-capable counterpart in Qt 2.3.
+
+  So I should port to use that instead.
+
+
+  * find a way to use the doc.txt docutils format for all documentation
+    (you can generate PDF with docutils and pdflatex already).
+
+  * xxdiff -D that succeed leaves a mutex destroy failure message... find the bug!
+
+
+   2) make able to see if there are any changes at all, to do this, we'll
+      compare all chars of the buffers by hand, if there is ANY differences that
+      it is different;  check size of buffers first
+
+
+  * cursor is not following scrolling anymore, FIX THIS this is annoying when
+    using the keyboard
+
+
+  * change config to use XML instead, add 'xxdiff --dtd' to obtain dtd.
+
+  * change key binding for variable text selection
+
+  * check out bug from (wesleysmith)
+
+If I select the line from the first column and then
+run "Save as left", I get a dialog that says "The
+selections are all on this file. Save anyway?". If I
+choose either the middle or right column and run "Save
+as left", then I don't see this message. I also see this
+message if I select the middle column and then
+run "Save as middle". It seems to me that this
+message doesn't really apply to the unmerge3 case,
+and should be disabled.
+
+Also, in the File menu, "Save as left" and "Save as
+middle" are activated, but "Save as right" is grayed out.
+That's odd because all three columns are the same file.
+Seems like they should all be available, or maybe only
+one, with the name changed to "Save".
+
+A similar problem is seen with the "Edit ..." menu items
+on the File menu.
+
+
+
+2 prorities for review:
+
+   1) make able to make comments rapidly
+
+   2) make able to see if there are any changes at all (turn off all ignore options at once?)
+      or perhaps look at the diff output
+
+   * quote output of clipboard header format \n's to be able to read back the
+     xxdiffrc file.
+
+
+   * create separate popup menus for different builders instead of ifdef
+     technology
+
+   * add "Edit Merged Filename" to resolve conflicts.
+
+   * implement --exclude and --exclude-from for directories, it would be really
+     useful for CVS directories
+
+   * implement arbitrary secondary selection, with filename in the clipboard,
+     for making easy merge comments, that would print filename, and pasted text
+
+   * Special "File" dialog with display and real filenames, with save as,
+     replace and edit buttons.
+
+   * try this: with horizontal diffs, remove two first chars of a line whose
+     indentation has changed, the horizontal diff will span from the beginning
+     of the line. this is not desired.
+
+   * in 3-way diffs mode, when you ignore one file, you must recompute the
+     horizontal diffs between the other two files only!  this would be very
+     useful actually.
+
+   * Add Accel.Quit alias for Accel.Exit
+
+   * xxdiff --version now results in the following error msg from Qt 3:
+      Mutex destroy failure: Device or resource busy
+     fix it. this doesn't seem to have other implications.
+
+(Split swap join improvements)
+
+   * Michael idea: split swap join where the cursor line is located
+
+(Urgent)
+
+   * Update documentation with this version.
+
+   * Make per-hunk display ignore toggleable
+
+//   * ./xxdiff mine util.h app.h Segfaults!!!! fix this??!
+// i think i just fixed it already
+
+
+   * XxText should accept() or ignore() its events.
+
+   * When in unmerge mode, saveAsMerge feature initializes merge file name as 01234567.
+
+   * Add format for filename label as well, useful for making merge comments.
+
+   * Invert logic of "Remove Empty Conditionals", that should be the default.
+
+
+(Per-hunk Ignore Whitespace)
+
+   * Not sure that the split-swap-join vs. ignore-display behaviour is correct,
+     perhaps should become green anyway when split?
+
+   * Maybe we can use the horizontal diffs computation to speed up the per-hunk ws?
+
+   * Implement partial hunk ignore ws, newlines have to match (but you can skip some).
+
+
+
+(Ignore Blank Lines)
+
+   * Consider.... should we do something about ignored SAME sides when saving? I
+     mean, now we just choose side 0, but perhaps we want to give the user
+     control over that?
+
+
+(Misc)
+
+   * scrolling with the scrollbar doesn't seem to restrict the cursor anymore
+
+   * Some of our display algorithms allow the user to effectively ignore certain
+     hunks. If all diff hunks are ignored by our display algorithms, could we
+     prevent xxdiff from even showing up at all? And if we do want it to remain
+     visible anyway, I think we should somehow put markers indicating at least
+     where whitespace changes occur anyway, in the margin or something, just to
+     be able to figure out if a file really does has some [whitespace] changes
+     or nothing at all.
+
+   * The cursor is not restricted by scrolling using the scrollbars anymore!!!
+
+   * When pasting to the clipboard, turn tabs into spaces, for much better
+     results when pasting! remember, the clipboard formatting can otherwise
+     change it.
+
+   * Paned view problem, the hash pattern that is drawn is not cleared before it
+     is drawn, switch workspaces with paned view and you'll see immediately.
+
+
+(Colors)
+
+   * There is no SelectedNonly color!
+
+
+(KDE Port)
+
+   * Trevor:
+
+     By the way, I forgot about a bug in my patch. If you go to Help|User's
+     Manual and click on the "GNU website" link at the end, then a web browser
+     opens just as it should. But if you click on a local link, such as
+     "Introduction", then the web browser again opens, instead of just jumping
+     to the point in the text. Help me remember to fix this sometime.
+
+
+
+
+   * ideas from Martin Pool (mbp@samba.org)
+    >
+    >  - Quick keypresses to switch to next/prev file
+
+    try C-n, C-p, n, p, etc. (see the menus for accelerators)
+
+    or do you mean, a key to open the next/prev file in another diff?
+    if so, that's a good idea, i'll put it on the todo list
+
+    >
+    >  - Single button to ignore *~, .#*, CVS, and similar garbage.  (The best
+    >    way I found was to edit the diff options.)
+
+    i want to do that eventually, that's on the todo list as well
+
+
+
+
+
+
+   * fix this problem:
+
+   Hello Martin,
+
+   there's someone reporting that error here:
+
+           http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=141809
+
+   and I do suspect it to be a Qt bug (happens on my box too btw.). I
+   searched the web a bit, but couldn't find any solution. Here's the place
+   where the error is reported btw.:
+
+           http://www.linux.cz/lists/archive/linux/131195.html
+
+   Does that happen on your box too? Is it a Qt problem?
+   *t
+
+   -----------------------------------------------------------------------
+        Tomas Pospisek
+        sourcepole    -   Linux & Open Source Solutions
+        http://sourcepole.com
+        Elestastrasse 18,  7310 Bad Ragaz,  Switzerland
+        Tel:+41 (81) 330 77 13,  Fax:+41 (81) 330 77 12
+   ------------------------------------------------------------------------
+
+
+
+
+
+
+
+   * Cool idea: tooltip when hovering over a hunk should show the diff marker
+     text. Or perhaps a popup menu could pop up the textual diff output.
+
+
+(Build)
+
+   * Try converting build system to use Jam instead of tmake.
+
+
+
+
+   * test recent changes to rendering code to see if it solves the problems with
+     qt-3 rendering.
+
+
+(Automatically-Saving Resources)
+
+   * Some ppl want to have resources saved automatically. Consider an
+     implementation.
+
+
+(Self Debugging and Error Reporting)
+
+   * Print commandline arguments when crashing with an internal error, as well
+     as resources state if possible.
+
+
+
+(Font Drawing Problem)
+
+   * There is a bug whereby editing the font in the dialog does not work
+     properly, the dialog does not show the appropriate font.  This occurs when
+     the font is set in .xxdiffrc.  Version: 3.1, the contents of the resources
+     file was::
+
+        FontText: "Lucidatypewriter,14,-1,2,50,0,0,0,1,0"
+        Accel.Exit: "Alt+Q"
+
+   * Italics fonts sometimes don't draw all that they should be.
+
+
+(Memory Checking)
+
+   * Run valgrind and mpatrol once again to stabilize.
+
+
+
+(Raw diff output)
+
+   * Implement a window to display the raw diff output. Some people may enjoy
+     this. kompare (kdiff2) has this.
+
+   * Implement a small widget that would display the current diff output chunk,
+     or perhaps put it in the tooltip.
+
+
+(Misc)
+
+   * When using replace file on a local file, "./" is added before the displayed
+     filename, find out why, and eradicate if possible.
+
+   * Convert arrays of string to use a QStringList in many places
+     (e.g. cmdline.h)
+
+   * I think we could free the buffers before reloading them on redo diff.
+
+   * set up rsync to update SF automatically from co version at DIRO:
+     rsync -Cavz -e ssh  . blais@xxdiff.sourceforge.net:/home/users/b/bl/blais/xxdiff/xxdiff-web
+
+
+
+(CVS unmerge conflicts)
+
+   * It would be nice that if you click on the filename labels it wouldn't add
+     the "(SOMEFILE)" into the clipboard.
+
+
+(Printed output)
+
+   * There is currently no generator of xxdiff-like output for printing. See if
+     the guts of xxdiff can be reused to implement one, and if so, add an xxdiff
+     feature to output to postscript or something.
+
+
+(Support for Encryption)
+
+   * Add possibility to specify a fd for an alternate input for a second
+     file. This way one can almost write a script that runs diff on two memory
+     buffers. But how does diff do it then?  Maybe that could be supported with
+     linking with the GNU diff code.
+
+
+
+
+
+
+Fix warnings reported from Geoff.Kingsmill at compaq compiling with g++-3.x:
+
+>
+> -  The following warnings were displayed:-
+>
+>    text.cpp: In method `virtual void XxText::drawContents(QPainter*)':
+>    text.cpp:263: warning: `int py' might be used uninitialized in this
+> function
+>
+>    diffs.cpp: In method `uint XxDiffs::countRemainingUnselected()
+> const':
+>    diffs.cpp:674: warning: `XxHunk curHunk' might be used uninitialized
+> in this
+>      function
+>    diffs.cpp:675: warning: `XxLine::Type curType' might be used
+> uninitialized in
+>      this function
+>
+>    In file included from resParser.cpp:703:
+>    resParser.l.c: In function `int XxResParserNS::__yylex(YYSTYPE*)':
+>    resParser.l.c:931: warning: label `find_rule' defined but not used
+>
+>    getopt.c: In function `_getopt_initialize':
+>    getopt.c:389: warning: unused parameter `argc'
+>    getopt.c:390: warning: unused parameter `argv'
+
+
+
+
+   * When the selections change the merged view horizontal scrollbars should be
+     adjusted.
+
+   * Resizing line numbers label leaves white border c**d behind, perhaps it
+     should clear the background before drawing.
+
+   * xxdiff still has problems displaying accented chars.
+
+   * Bug: not all control paths in the text rendering engine are setting
+     skip. The merged lines counting routine either.
+
+   * Bug in next difference:  use "mine older", then n many times.
+     At some point the n command does not bring you to the beginning of a new region.
+
+   * Merged length in lines is incorrectly calculated.
+
+   * The line number labels are not initialized properly on startup.
+
+   * Add cmdline option to show pane-merged view upon startup.
+
+   * Consider using the SUP colors for the empty lines.
+
+   * Scrollbar would be better if it always would be able to show at least a one
+     pixel row at the very bottom.
+
+   * Color documentation, shadowed might be "highlighted"... fix it.
+
+   * You need to figure some decent scrolling heuristic for the merged view to
+     follow the text views, especially when they are radically different sizes.
+     Right now it just follows the cursor.
+
+   * Post-central testing:  test setting tab width, see if horizontal scrollbars
+     adjust automatically.
+
+   * Make rpm spec generate documentation automatically.
+
+   * Remove uint, put standard "unsigned int" instead.
+
+   * In merged view, the stippled pattern doesn't scroll horizontally.
+
+
+
+(Multiple Horizontal Diffs)
+
+   * Can we actually do something more about 3-way horizontal diffs?
+     Compute the 2-way and then merge results?
+
+   * We could remove empty horizontal regions from horizontal diffs?  They don't
+     hurt but we could draw more efficiently without them if we don't use them.
+
+   * Perhaps draw a little dent on the side where an insertion/deletion occured.
+     With an option.
+
+   * Perhaps group all the horizontal diffs display options together.
+
+   * > Allen Barnett wrote:
+     > >
+     > > On Thursday 08 November 2001 12:25 pm, you wrote:
+     > > > Allen Barnett wrote:
+     > > > > One feature which would be helpful to me would be the presence of a
+     > > > > 'numerical fuzz' option in the horizontal difference display. If  a line
+     > > > > contains a floating point number, but whose numerical difference is below
+     > > > > a certain tolerance, it would not be marked as a file difference. For
+     > > > > example:
+     > > > >
+     > > > > 1.2345678E-01  |  1.2345679E-01
+     > > > >
+     > > > > would not be flagged if the fuzz value is "<10^-6". (Can you tell I do a
+     > > > > lot of FORTRAN programming?)
+     > > >
+     > > > what if this was only implemented for the beginning of the horizontal
+     > > > difference?  would that be good enough?
+     > >
+     > > Typically, my output looks like line after line of:
+     > >
+     > > 0.182827585 0.140213637 0.113408089 0.140213637 0.106706702 0.0859152186
+     > >
+     > > One or more of these numbers on a line may differ between runs of the code.
+     > > Further reflection on my part suggests that you'd have to parse the line to
+     > > find the numbers. Perhaps this isn't really a practical idea after all?
+     >
+     > I was discussing ideas over lunch with colleagues: soon i'll implement the
+     > string edit lcs algorithm for computing multiple horizontal diffs.  one idea
+     > that came out is that I could carry this out on a per-token instead of a
+     > per-character basis.  The token splitting I'll implement is arbitrary, but I
+     > will implement it based on words (where capital letters inside a word splits
+     > it).  The whitespace you show above would split your numbers into different
+     > tokens.
+     >
+     > This means that if I apply a "numerical ignore" on the respective horizontal
+     > diff hunks of a line it would do exactly what you want, assuming that the words
+     > (i.e. numbers) are separated by whitespace.  The numerical comparison will be an
+     > option that you can configure in your resources.
+
+(Bugs)
+
+   * In resources::setQuality... setOneOfInCommand, does it remove the options
+     that are present if the one to set is empty?
+
+   * Once xxdiff is up, if you change the options for the diff command and give
+     it options that make it fail, no error message is printed, no dialog,
+     nothing, it just goes empty.
+
+   * Figure out why when a char isn't read by lex/yacc it is printed on stdout,
+     and fix that, it's annoying and stupid
+
+   * Redo diff clears selections!  can we do something about it?
+
+
+(Improve Directory Diffs)
+
+> *  Improve the comparison options for directories. Files and Dirs
+>    should be selectively comparable for time, mode, owner,group,
+>    and raw and filterd data.
+>    I could write the backend of this part, if you like to include
+>    this ability, but I can't write the front end (gui) part.
+
+
+   * Make xxdiff able to go to the parent directories
+
+     While comapring two directory trees I noticed one can
+     always go up one level (towards the leafe nodes)
+     through the GUI, but not down or 'back'.
+
+    Suggestion:
+    Add a new button to the toolbar [arrow-pointing-upwards],
+    which stripps the last level of the current path on both sides
+    and reads those directories.
+
+    Beware of [up] + / as path :-).
+    Thank you,
+    Volker Apelt
+
+
+(Misc)
+
+   * Change file builders to use QCString internally.
+
+   * Optimize parsing the diff outputs, this big series of if-else is
+     inefficient, diff2 and diff3 both for files
+
+   * Check out if we can make use of the QApplication useGUI parameter instead
+     of not creating the QApplication at all... does it try to open the display
+     when set to false?
+
+   * Put all the resources text as what's this in the options dialog
+
+   * Bug: for certain fonts, the text is not drawn completely without the
+     fillrect... a line shows up under the text... fix this.
+     (In the worst case, detect and fill by hand.)
+
+   * bug: ^L's do not get rendered correctly?...
+
+   * --titlein does not fail when no file is given in stdin.
+     This is harmless but perhaps it would be nice to check and warn that this
+     does not make sense to specify.
+
+
+
+(Token horizontal diffs)
+
+   * Token horizontal diffs computation option (idea from idanan)
+
+   * Case-sensitive Horizontal diffs?
+
+
+
+(Web site)
+
+   * Add emacs trick to start xxdiff automatically on previous file
+
+   * Add to google direcotry!!!
+
+   * Add directories
+   * From freshmeat, "run query" link
+   * Links from Perfore web site
+
+   * Add link to apps.kde.com entry (which is pretty much up-to-date).
+
+
+(Improve options dialog synchronization)
+
+   * Sync options dialog
+
+     * For options dialog, on synchronize() we should really only update the
+       controls which haven't been changed.  how do we do that?  perhaps have it
+       work on a different resources object?
+
+     * Apply display box resets horizontal diffs...
+       Options dialog has to update on resources changes...
+       ... figure out something with a second copy of the resources object.
+
+
+(Try using Mightnight Commander backend)
+
+> *  If xxdiff calls the vfs layer of midnight commander instead of
+>    unix filesystem functions directly, it could enter and compare
+>    even archive contents and ftp servers.
+>    The libfs-mc.so is a sub project within mc and independent
+>    of mc.
+>
+>    The required changes to the existing xxdiff code are an
+>    exchange  of the unix calls with their vsf counter parts and
+>    one initialization/shutdown call at start and program end.
+>
+>    eg:   open(..) becomes  mc_open(..),
+
+
+(Internal diffs)
+
+   * Enable internal GNU diff as a runtime option
+
+   * Implement the 3-way and dir. version of this (not done yet)
+
+   * Internal diff: must set status with correct values as external diff
+     this currently does not work with files being the same
+
+
+(Port to Qt-3.0)
+
+   * Implement reading process output with QProcess
+
+   * Port to Windows using the Qt Non-commercial license 3.0, or mingw32
+
+
+(Misc GUI stuff)
+
+   * Add an option to draw a pattern within empty lines, to make them stand out
+     more (not just a color).
+
+   * While selecting the colors, implement a color picker so you could select a
+     color in the text view
+
+   * Add support for wheel events, even in overview area.
+
+   * Add an easter egg, pretty much noone ever looks at the source code.
+
+   * Allow selection of text, as in an editor, just for cut-n-paste purpose
+     (line based only though).
+
+   * Selecting many lines in a big hunk one-by-one is lame.
+     Do something at the same time that you implement region selection.
+     Extended selection (on mouse release normal click except when straddling
+     lines) allow larger selection (smarter key down/up processing).
+     Region Selection for the purpose of cut-n-paste.
+
+   * Add invert selection functionality
+
+   * "What's this?" on a file widget should babble about the specific region
+     which was clicked on.
+
+   * It would be nice to be able to select both sides of a hunk for making
+     merge comments... but thru which UI do we do this?
+
+   * Popup menu should implement selection instead of motion commands, maybe
+     depending on if clicked on an IGNORE region or not;
+
+   * Add more/less contrast buttons for easy changing all colors simulatneously
+     for horizontal diffs.
+
+
+(Search results)
+
+   * Make each line able to contain multiple search results instances (a list).
+
+   * Draw brackets around search results, over text area, highlighting search
+     results.
+
+   * Add case sensitivity to search feature.
+
+   * Search using regexp.
+
+   * Add a status bar -like widgets line at the bottom, with exclude lineedits
+     and search widgets, and make it work a la emacs.
+
+
+(Ignore regexp/pattern)
+
+   * Use display-ignore feature to ignore certain regexp
+
+   * Use display-ignore feature to ignore change from regexp A to regexp B
+     (gijsbert)
+
+   * Add a line at the bottom for interactive search widget and ignore pattern
+     widgets (line edits)
+
+
+(Documentation)
+
+   * Rename "regions" to "hunks" and use GNU diff terminology from texinfo
+
+   * Open left/right on an empty xxdiff should allow to open!
+     Supporting one file only.  (on startup AND on an open diff) this can be
+     done easily by specifying the "other" file as an empty file and running
+     the current diff parser.
+
+   * Add an option for splitting all CHANGE regions automatically (buh?)
+
+   * Add an option to display context format diffs into its own widget, like
+     for the line numbers.
+
+   * allow insertion of marker lines
+
+   * Add save options for save selected only file dialog;
+
+   * Keep the cursor line in region after swap->merge transition;
+
+   * feature: show only hunks, collapse ignore regions...
+
+   * feature: ignore diffs from "this" to "that" (-I option) should we have a
+     different color for ignored diffs?  say e.g. case insensitivity done at the
+     xxdiff level (for that the ``ignore'' algorithm must be done by xxdiff
+     itself)
+
+
+(More checks and verification)
+
+   * Check if can parse context, ed, normal, or unified diffs output, the user
+     might specify such an erroneous command;
+
+
+
+
+--------------------------------------------------------------------------------
+Tasks: Merged view improvements.
+
+(Quick save merged results)
+
+   > Merged file name parameter
+   >
+   >
+   >  I have tried xxdiff with CM/Synergy. Horizontal diffs
+   > are really neat. Furthermore it would be nice to have a
+   > default output file parameter (like -o filename) for
+   > the merge operation and a save button to write output
+   > to this file.
+   >
+   >
+   > Message
+   >
+   >
+   >
+   > Date: 2001-11-20 14:03
+   > Sender: blais
+   > Logged In: YES
+   > user_id=10996
+   >
+   > Sounds like an easy feature to implement.
+   >
+   > I assume that what you want is a default filename so that
+   > you don't have to type it in when you save.  The way it
+   > could work is that this new save button would not pop the
+   > file dialog, and would save to some default name, like
+   > "<filename>.merge" in ClearCase, or the filename
+   > you
+   > specified as an option  (of course, if the file already
+   > exists, it would pop a warning).  Sounds reasonable.  I
+   > would also add a menu entry for this kind of fast save.
+   >
+   > I guess you'd also want an option to save automatically if
+   > the merge succeeded without conflicts, without even
+   > showing the UI at all?  I wanted to do this eventually
+   > from a script from the outside, but if you'd know what
+   > filename to save merged results to, I find it would
+   > reasonable to support this.
+   >
+   > For quick access to that special save as feature I'd add a
+   > button in the existing toolbar.
+   >
+   > Any more ideas let me know.  They will certainly be
+   > considered seriously.  I'm in feature mode these days...
+   >
+   >
+   >
+   >
+   >
+   > Date: 2001-11-21 05:04
+   > Sender: nobody
+   > Logged In: NO
+   >
+   > This is exactly the way CM/Synergy works. You specify a
+   > template for merge command with placeholders for file
+   > revision names, inclusive the name of the temporary output
+   > file. What you need to do is only to say "Save" after
+   > you
+   > done and a new revision will be created from that output
+   > file. With this feature is xxdiff far superior to vendor
+   > supplied diff tool.
+   > I have 2 suggestions about usability:
+   > 1. Mouse wheel for the right scrollbar. You have two
+   > scrollbars in the application, in the middle of the main
+   > window and on the right side. In most cases I have the right
+   > scrollbar enabled and I prefer it over the middle scrollbar,
+   > because it is common for the most applications. With the
+   > middle scrollbar I can scroll with the mouse wheel, with the
+   > right I can only drag. Please make the mouse wheel work for
+   > the right scroll bar.
+   > 2. Compact view. Is it possible to introduce a compact view
+   > mode, where only the differences between files are visible?
+   > I would go so far to say, this should be the default mode
+   > and only when you need, you can expand the view to full
+   > (current) mode. If it already works, and I miss some
+   > parameter please insert a remark in the FAQ about how to do
+   > this.
+   >
+   >
+   >
+   > Date: 2001-11-21 08:21
+   > Sender: blais
+   > Logged In: YES
+   > user_id=10996
+   >
+   > 0. Cool.  I don't think xxdiff will create a new revision
+   > automatically though, if I'm not mistaken, the way
+   > ClearCase's xcleardiff works is by just leaving the saved
+   > file checked out, then when you check it in, it will
+   > create the merge arrow/dependency in the database.  How
+   > would it work for CM/Synergy?  In other words, do their
+   > diff program need to do something special apart from just
+   > saving out the merged results to a file?
+   >
+   > 1. Mouse wheel support.  I'll do it eventually.  The
+   > scrollbar on the right is all implemented "by hand",
+   > it is
+   > part of the overview display and I added this scrollbar
+   > like behaviour after.   This is why it doesn't work right
+   > now.  I think it will be easy to do though.
+   >
+   > 2. Doesn't just using the "n" and "p" keys
+   > work just right
+   > for that?  It just skips to the next/previous change.
+   > That's what we do at discreet, and most seem happy abuot
+   > it.
+   >
+   > Thanks for keeping the dialog, this in the end will help
+   > make xxdiff a better product.  I plan to eventually add
+   > some kind of support for most CM systems, but only when
+   > I'm done with non-CM specific features (e.g. patch input
+   > and output).
+
+
+
+(Misc)
+
+   * Rewrite rendering engine for merged view like the text one!  can we share
+     the code?
+
+
+   * Merged view option to draw all hunk texts instead of men-at-work pattern
+
+   * Fix all issues raised in merged.cpp FIXME comments.
+
+   * Merged view: the motion commands should work from the merged view.
+
+   * Selection commands should work too
+
+   * Scrolling the merged view should scroll the other view as well.
+
+   * Merged view cannot mouse-drag properly.  Implement a more viable solution
+     that will allow to to the inverse drag as well, perhaps setting up a
+     publicly-available indirection table in the XxDiffs object.
+
+   * Merged view: add different colors for different selected sides
+
+   * Merged view: display both regions in merged view when unselected
+     (as an option)
+
+   * Add "show merged view on startup" resource.
+
+   * Merged view: should have the option of seeing both files' hunks instead of
+     "work" lines.
+
+
+(One-Pane View)
+
+   * Support one-pane view, where both selections are shown together in one text
+     view.  Do this for merged view only.  Perhaps allow selection there.
+
+
+--------------------------------------------------------------------------------
+Tasks: Editing
+
+   * Implement some editing in the merged view!!
+
+> Re: [xxdiff/perso] Changing merged output manually?
+> From: Xavier Outhier <xavier.outhier@anfdata.cz>
+>  To: Martin Blais <blais@discreet.com>
+>  Date: Tue, 22 Jan 2002 09:27:53 +0100
+>
+> Martin Blais wrote:
+> >
+> > On Monday 21 January 2002 07:06, you wrote:
+> > > Hi,
+> > >
+> > > I have a question about xxdiff
+> > > (http://sourceforge.net/projects/xxdiff/).
+> > >
+> > > Is it possible to change the merged file
+> > > manually. I mean to be able to add text
+> > > that is not in any of the 2 or 3 files
+> > > compared. This is sometime very useful.
+> > >
+> > > I haven't see that (clearly) in the online
+> > > documentation. I think this will be a very
+> > > interesting item for the FAQ.
+> > >
+> > > I'm using ClearCase at work and from this
+> > > point of view clearmerge is really good.
+> > > But for me, I would prefer some tool under
+> > > GPL.
+> >
+> > nope, you cannot. the rationale behind this is that I don't
+> > want xxdiff to become an editor.
+>
+> It would be a logical evolution, wouldn't it?
+> I mean for the merge window only.
+>
+> >  i'd like to eventually make it able to do very simple
+> > editing (and to limit it to that).
+> >
+> > you can, however, click on the filename widgets to put
+> > them in the clipboard and then paste into a shell for
+> > editing the file.
+>
+> Not very friendly way and error prone I suppose.
+>
+> > let me know the minimal editing capabilities you would
+> > like to have and i'll consider it on the todo list.
+>
+> For me the minimum would be to able to add a complete
+> line anywhere in the merged window.
+> Maybe this can be only before or after the diff line from
+> the sources to be merged.
+> A special highlighting should be provided in order to
+> make the difference between original code (from the sources)
+> and the user added lines.
+>
+> Possibility to add nay number of line instead of one would
+> be better of course.
+>
+> This excludes adding lines in diff parts if multiple-lines.
+> This also excludes adding/changing any section of text
+> in existing lines.
+>
+> Is it reasonnable?
+> What's your estimation of difficulty and amount of time
+> to make the change?
+> What if some contributor do it?
+>
+> - Again a question: What's the difference between rmp in
+> different Linux distribution? I'm running SuSE 7.2. I might
+> be interested in preparing rpm for SuSE. Is it worth to do it?
+>
+>
+> Regards,
+>
+> Xavier.
+>
+> PS: tu parles francais?
+> --
+> D2SET Scientific and Technical Non profit Association
+>  http://www.d2set.org/
+>  mailto:d2set@d2set.org
+>
+> Artificial Anthill Project
+>  http://www.aanthill.org/
+>  mailto:aanthill@aanthill.org
+>
+
+
+
+
+--------------------------------------------------------------------------------
+Tasks: Patch support.
+
+(Patch application idea)
+
+Oded Arbel <oded@geek.co.il>
+> BTW - in MS-Windows I use this pretty nice diff program called WinMerge,
+> and its one cool feature is that I can tell it to copy the selected
+> difference from one of the files to the other - actually being a "manual"
+> merge tool. it would be really nice if xxdiff had this feature - I like to
+> be able to selectibly apply partial differences w/o going to the trouble of
+> editing patch files by hand.
+
+
+(Patch input support)
+
+   * Make it able to read in a patch and apply it, without the second file
+
+   * Allow diff using a patch file, even containing a patch for many files
+     (easy: you could let patch patch the file on stdout, grab the output and
+     perform normal diff)
+
+
+(Patch output support)
+
+   * Make it able to output a patch
+
+
+--------------------------------------------------------------------------------
+Tasks: Directory diffs improvements and bug fixing.
+
+(Directory Diffs Misc)
+
+   * Don't show vertical line on directory diffs!
+
+   * In dirdiffs mode, cut-n-paste should just put the clicked filename (one
+     side) in the clipboard, without the \n.
+
+   * Launching xxdiff dirs with two same directories results in an empty buffer
+     thingy, because diff itself just silently returns.
+
+   * New functionality that spawns a bunch of diffs for all the changed files
+     in a directory (dirdiffs only).
+
+   * In dir diffs, remove toolbar buttons, selection menus, open file must be
+     able to select a directory, etc. IOW finish checking that all that is left
+     works.
+
+   * Add exclude option to diff options
+
+     > 2. Running "xxdiff dir1/*.c dir2/*.c caused seg. fault.
+     >     "dirdiff", available at freshmeat.net, runs with no problem.
+     >
+     > Thanh Ma wrote:
+     > >
+     > > Hi,
+     > >
+     > > 2. Running "xxdiff dir1/*.c dir2/*.c caused seg. fault.
+     > >     "dirdiff", available at freshmeat.net, runs with no problem.
+     > >
+     >
+     > I found the bug for this one.  THis is a simple cmdline parsing bug I had
+     > never found. Thanks again for reporting it.
+     >
+     > In any case, this should not work:  your shell expands the list of files, so
+     > in effect your program get the whole list... how is it supposed to know which
+     > list is on which side?  I guess it looks at the directory prefixes.
+     >
+     >  I wonder if it handles dirdiff dir1/*.c dir2/*.c dir3/some.c
+     > In any case, an ignore pattern will be implemented eventually to do the same
+     > as what you're asking.  When I get that done I'll probably extend the cmdline
+     > interface to do like diff does.  GNU diff doesn't handle this cmdline
+     > interface:
+     >
+     >
+     > taiwan:/DLlocal/.../xxdiff/test$ diff -q -r d1/*.c d2/*.c
+     > diff: extra operand
+     > diff: Try `diff --help' for more information.
+
+   * Show symlinks, date and size of files in directory diffs
+
+   * Add an icon somewhere to show if a directory diff or a simple file diff
+
+   * Add a file viewer command for dirdiff to spawn on inserts and deletes in
+     dirdiff mode!  That would be great!
+
+
+--------------------------------------------------------------------------------
+Tasks: CM integration
+
+(CVS revisions browsing)
+
+   * Write independent app running in a different process to dnd CVS revisions
+
+   * Make the text area a drop site for files, so files from the other guy or
+     from some file manager could be dropped right into it and be diffed
+     automatically.  This will require some non-trivial temporary file diddling.
+
+(Xxscripts)
+
+   * Implement xxcvs update.
+
+   * CVS and Clearcase: write interface/protocol scripts
+
+   * Mv xxct to xxcleartool and implement using distutils
+
+   * Separate cvs stuff from xxcvs into cvslib, use distutils
+
+(General CM support)
+
+   * Some features:
+
+     | Peter Becker wrote:
+     | >
+     | > > Anyway, my question:
+     | > >
+     | > > I want to implement some support for CM systems, in particular ClearCase and
+     | > > CVS. I wish to implement this in a generic manner, in order to support
+     | > > multiple CM systems.
+     | > >
+     | > > I need your input: what CM-related features would you like to see supported in
+     | > > a file comparison program?  Here's what I'm thinking of:
+     | > >
+     | > >  - revision tree listing i.e. looking at the history
+     | > >    of revisions
+     | > >
+     | > >  - automatic version extraction i.e. being able
+     | > >    to switch which version of file xxdiff is
+     | > >    diffing with, probably by clicking in the
+     | > >    revision tree listing
+     | > >
+     | > >  - ability to checkout latest version (prior to saving
+     | > >    a merge result).
+     | > >
+     | > >  - All CM commands should be run in background in case
+     | > >    of slow access to CM server
+     | > >
+     | > > Anything else?  Please let me know, I want to know what could be useful to
+     | > > you.  Any comments appreciated.
+     |
+     |
+     |
+     | > Something we use all the time is cvs edit -- it would be useful for us if a merge
+     | > tool can handle read-only checkout and edit/unedit.
+     |
+     | When I mentioned "checkout" above, in cvs it's called "edit", so we're talking
+     | about the same thing:
+     |
+     | >From cvs documentation:
+     | > you are planning to edit it, use the `cvs edit' command.  Some systems
+     | > call this a "checkout", but CVS uses that term for obtaining a copy of
+     | > the sources (*note Getting the source::.), an operation which those
+     | > systems call a "get" or a "fetch".
+     |
+     |
+     | > Useful for the comparison of different versions of the program is a program that
+     | > combines directory and file comparison -- the overview shows all files and if they
+     | > are different, the files that are different can be opened in the file diff.
+     |
+     | xxdiff already does that.  If you call it on two directories, you can select
+     | files and use the popup menu to get an xxdiff of the specific files.
+     |
+     | xxdiff also works recursively on directories.  It makes it really easy to
+     | compare hierarchies this way (this is how I merge my configuration files, for
+     | example).
+     |
+     | However, you just gave me another idea: one may wish to compare tagged
+     | versions, as a directory diff, e.g. compare hierarchy with 1.8 tag and 1.9
+     | tag.  I'll look into how I could do this. This would be a cool feature.  Do
+     | you get it?  for example, you could spawn a directory diff in your current
+     | directory, asking xxdiff to compare with the latest tagged versions.
+
+
+
+(Annotations)
+
+   * Somehow support annotations within xxdiff, with input perhaps from some
+     script, perhaps integrated from C++.
+
+     | >
+     | > Some nice but really not important feature: connecting the lines of the code with
+     | > the last changes (and their logs). This is useful if you ask yourself: what is
+     | > this code for? But maybe this feature shouldn't go into a diff tool.
+     |
+     | Surely it could be nice to be able to extract and display the log comments for
+     | shown revisions, good idea! I'll add it in.
+
+
+
+(Binary Diffs)
+
+   * Idea (plante@iro): Pour faire des diffs de fichiers binaires...
+     Sers-toi d'un programme qui fait des hexdumps (sur linux il y a xxd), et
+     fais le diff la-dessus. Ça marche bien.
+
+

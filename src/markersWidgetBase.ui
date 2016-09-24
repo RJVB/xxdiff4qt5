@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0" stdsetdef="1">
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>XxMarkersWidgetBase</class>
+  <widget class="QWidget" name="XxMarkersWidgetBase">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>537</width>
+        <height>253</height>
+      </rect>
+    </property>
+    <property name="windowTitle">
+      <string>Form3</string>
+    </property>
+    <layout class="QVBoxLayout">
+      <property name="margin">
+        <number>11</number>
+      </property>
+      <property name="spacing">
+        <number>6</number>
+      </property>
+      <item>
+        <widget class="QLabel" name="TextLabel1_2">
+          <property name="font">
+            <font>
+              <family>helvetica</family>
+              <pointsize>14</pointsize>
+            </font>
+          </property>
+          <property name="text">
+            <string>Some regions were found that are still UNSELECTED.</string>
+          </property>
+          <property name="alignment">
+            <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap">
+            <bool>false</bool>
+          </property>
+        </widget>
+      </item>
+      <item>
+        <widget class="QGroupBox" name="_groupbox">
+          <property name="title">
+            <string>Unselected lines</string>
+          </property>
+          <layout class="QVBoxLayout">
+            <property name="margin">
+              <number>11</number>
+            </property>
+            <property name="spacing">
+              <number>6</number>
+            </property>
+            <item>
+              <widget class="QRadioButton" name="_checkboxConflicts">
+                <property name="text">
+                  <string>Save as merge conflicts</string>
+                </property>
+              </widget>
+            </item>
+            <item>
+              <layout class="QHBoxLayout">
+                <property name="margin">
+                  <number>0</number>
+                </property>
+                <property name="spacing">
+                  <number>6</number>
+                </property>
+                <item>
+                  <widget class="QRadioButton" name="_checkboxConditionals">
+                    <property name="text">
+                      <string>Save with conditionals</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QCheckBox" name="_removeEmptyConditionals">
+                    <property name="text">
+                      <string>Remove empty conditionals</string>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
+            </item>
+            <item>
+              <layout class="QHBoxLayout">
+                <property name="margin">
+                  <number>0</number>
+                </property>
+                <property name="spacing">
+                  <number>6</number>
+                </property>
+                <item>
+                  <widget class="QLabel" name="_labelConditional1">
+                    <property name="text">
+                      <string>Conditional variable:</string>
+                    </property>
+                    <property name="wordWrap">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QLineEdit" name="_lineeditConditional1">
+                    <property name="text">
+                      <string>FILE1</string>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
+            </item>
+            <item>
+              <layout class="QHBoxLayout">
+                <property name="margin">
+                  <number>0</number>
+                </property>
+                <property name="spacing">
+                  <number>6</number>
+                </property>
+                <item>
+                  <widget class="QLabel" name="_labelConditional2">
+                    <property name="text">
+                      <string>Conditional variable:</string>
+                    </property>
+                    <property name="wordWrap">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QLineEdit" name="_lineeditConditional2">
+                    <property name="text">
+                      <string>FILE2</string>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
+            </item>
+            <item>
+              <layout class="QHBoxLayout">
+                <property name="margin">
+                  <number>0</number>
+                </property>
+                <property name="spacing">
+                  <number>6</number>
+                </property>
+                <item>
+                  <widget class="QLabel" name="_labelConditional3">
+                    <property name="text">
+                      <string>Conditional variable:</string>
+                    </property>
+                    <property name="wordWrap">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QLineEdit" name="_lineeditConditional3">
+                    <property name="text">
+                      <string>FILE3</string>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
+            </item>
+          </layout>
+        </widget>
+      </item>
+    </layout>
+  </widget>
+</ui>

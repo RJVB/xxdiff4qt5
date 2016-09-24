@@ -1,0 +1,23 @@
+#!/usr/bin/env make
+#
+# Generate the Makefile using both qmake and the custom rules we need to add on
+# top of it.
+#
+
+# Rule to generate the qmake Makefile for building xxdiff.
+QMAKE ?= /usr/bin/qmake-qt4
+
+all: Makefile
+
+OS := $(shell uname -s)
+ifeq ($(OS),Darwin)
+    # Default is an Xcode project, so force a makefile build
+    export QMAKESPEC=macx-g++
+endif
+
+Makefile.qmake: xxdiff.pro
+	$(QMAKE) -o Makefile.qmake $<
+
+Makefile: Makefile.qmake Makefile.extra
+	cat $^ > Makefile
+

@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# $Id: bashrc 760 2004-02-09 18:51:12Z blais $
+# $Source$
+#
+# Bash configuration for this project.
+#
+
+# Make bash invoke optcomplete completion for the scripts.
+#
+# This is not necessary for other users, the scripts will work without 
+# auto-generated programmable completion.
+complete -F _optcomplete svn-foreign
+complete -F _optcomplete xx-cond-replace
+complete -F _optcomplete xx-cvs-diff
+complete -F _optcomplete xx-cvs-revcmp
+complete -F _optcomplete xx-diff-proxy
+complete -F _optcomplete xx-encrypted
+complete -F _optcomplete xx-filter
+complete -F _optcomplete xx-find-grep-sed
+complete -F _optcomplete xx-match
+complete -F _optcomplete xx-pyline
+complete -F _optcomplete xx-rename
+complete -F _optcomplete xx-sql-schemas
+complete -F _optcomplete xx-svn-diff
+complete -F _optcomplete xx-svn-resolve
