@@ -117,9 +117,6 @@ irix-n32:QMAKE_CFLAGS_RELEASE += -OPT:Olimit=4000
 macx {
    QMAKE_CFLAGS -= -O2
    QMAKE_CXXFLAGS -= -O2
-   QMAKE_CFLAGS += -O3 -march=native -g -flto
-   QMAKE_CXXFLAGS += -O3 -march=native -g -flto -stdlib=libc++
-   QMAKE_LFLAGS += -L/opt/local/lib -Wl,-headerpad_max_install_names -O3 -march=native -g -flto -stdlib=libc++
 
    # Icon used for the application bundle
    ICON = xxdiff.icns
@@ -146,7 +143,6 @@ macx {
 
    QMAKE_EXTRA_TARGETS += macdeployqt dmg deploy
    QMAKE_CXXFLAGS += -mdynamic-no-pic
-   INCLUDEPATH += -I/opt/local/include/qt5
 }
 
 #----------------------------------------
